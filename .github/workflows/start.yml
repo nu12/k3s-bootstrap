@@ -4,6 +4,7 @@ jobs:
   Start:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
       - name: terraform
         run: |
           sed -i -e "s/_PLACEHOLDER_SUBSCRIPTION_/${{secrets.ARM_SUBSCRIPTION_ID}}/g" -e "s/_PLACEHOLDER_STORAGE_ACCOUNT_/${{secrets.STORAGE_ACCOUNT_NAME}}/g" terraform/backend.conf
