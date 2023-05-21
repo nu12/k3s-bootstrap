@@ -1,0 +1,31 @@
+name: Create K3s cluster
+on: [workflow_dispatch]
+jobs:
+  Start:
+    runs-on: ubuntu-latest
+    steps:
+      - name: terraform
+        run: |
+          sed s/_PLACEHOLDER_SUBSCRIPTION_/${{secret.ARM_SUBSCRIPTION_ID}}/_PLACEHOLDER_STORAGE_ACCOUNT_/${{secret.STORAGE_ACCOUNT_NAME}}/g terraform/backend.conf
+
+          echo $SSH_PUBLIC > ~/.ssh/id_rsa.pub
+          echo $SSH_PRIVATE > ~/.ssh/id_rsa
+          chmod 400 ~/.ssh/id_rsa
+
+          export ARM_CLIENT_ID="${{secret.ARM_CLIENT_ID}}"
+          export ARM_CLIENT_SECRET="${{secret.ARM_CLIENT_SECRET}}"
+          export ARM_TENANT_ID="${{secret.ARM_TENANT_ID}}"
+          export ARM_SUBSCRIPTION_ID="${{secret.ARM_SUBSCRIPTION_ID}}"
+
+          terraform init -chdir=terraform/ -backend-config=backend.conf
+          terraform -chdir=terraform/ apply -auto-approve
+
+      # Get terraform outputs
+
+      - name: ansible
+        run: |
+          ansible-playbook ansible/site.yml -i ansible/inventory/k3s/hosts.ini
+      
+      # Change master-ip group_vars/all.yml
+      # Change master-ip hosts.ini
+      
