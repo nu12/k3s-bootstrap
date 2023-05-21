@@ -9,6 +9,7 @@ jobs:
         run: |
           sed -i -e "s/_PLACEHOLDER_SUBSCRIPTION_/${{secrets.ARM_SUBSCRIPTION_ID}}/g" -e "s/_PLACEHOLDER_STORAGE_ACCOUNT_/${{secrets.STORAGE_ACCOUNT_NAME}}/g" terraform/backend.conf
 
+          mkdir -p ~/.ssh
           echo $SSH_PUBLIC > ~/.ssh/id_rsa.pub
           echo $SSH_PRIVATE > ~/.ssh/id_rsa
           chmod 400 ~/.ssh/id_rsa
