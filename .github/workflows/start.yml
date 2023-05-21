@@ -6,7 +6,7 @@ jobs:
     steps:
       - name: terraform
         run: |
-          sed -i "s/_PLACEHOLDER_SUBSCRIPTION_/${{secrets.ARM_SUBSCRIPTION_ID}}/_PLACEHOLDER_STORAGE_ACCOUNT_/${{secrets.STORAGE_ACCOUNT_NAME}}/g" terraform/backend.conf
+          sed -i -e "s/_PLACEHOLDER_SUBSCRIPTION_/${{secrets.ARM_SUBSCRIPTION_ID}}/g" -e "s/_PLACEHOLDER_STORAGE_ACCOUNT_/${{secrets.STORAGE_ACCOUNT_NAME}}/g" terraform/backend.conf
 
           echo $SSH_PUBLIC > ~/.ssh/id_rsa.pub
           echo $SSH_PRIVATE > ~/.ssh/id_rsa
