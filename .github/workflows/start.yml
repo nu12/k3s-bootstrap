@@ -36,5 +36,8 @@ jobs:
         run: |
           sed -i -e "s/_PLACEHOLDER_MASTER_IP_/${{steps.terraform.outputs.public_ip}}/g" ansible/inventory/k3s/hosts.ini
           sed -i -e "s/_PLACEHOLDER_MASTER_IP_/${{steps.terraform.outputs.public_ip}}/g" ansible/inventory/k3s/group_vars/all.yml
+          
+          ssh-keyscan -H ${{steps.terraform.outputs.public_ip}} >> ~/.ssh/known_hosts
+          
           ansible-playbook ansible/site.yml -i ansible/inventory/k3s/hosts.ini
       
