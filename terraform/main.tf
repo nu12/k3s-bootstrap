@@ -22,6 +22,7 @@ resource "azurerm_public_ip" "k3s" {
   resource_group_name = azurerm_resource_group.k3s.name
   location            = azurerm_resource_group.k3s.location
   allocation_method   = "Static"
+  #domain_name_label
 }
 
 resource "azurerm_network_interface" "k3s" {
