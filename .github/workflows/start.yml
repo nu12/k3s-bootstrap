@@ -30,8 +30,6 @@ jobs:
           echo "public_ip=$ip" >> "$GITHUB_OUTPUT"
           echo "fqnd=$fqnd" >> "$GITHUB_OUTPUT"
 
-      # Get terraform outputs
-
       - name: ansible
         run: |
           sed -i -e "s/_PLACEHOLDER_MASTER_IP_/${{steps.terraform.outputs.public_ip}}/g" ansible/inventory/k3s/hosts.ini
