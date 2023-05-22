@@ -5,7 +5,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: terraform
+      - id: terraform
+        name: terraform
         run: |
           sed -i -e "s/_PLACEHOLDER_SUBSCRIPTION_/${{secrets.ARM_SUBSCRIPTION_ID}}/g" -e "s/_PLACEHOLDER_STORAGE_ACCOUNT_/${{secrets.STORAGE_ACCOUNT_NAME}}/g" terraform/backend.conf
 
@@ -23,12 +24,17 @@ jobs:
           terraform -chdir=terraform/ init -backend-config=backend.conf
           terraform -chdir=terraform/ apply -auto-approve
 
+          ip=$(terraform -chdir=terraform/ output public_ip_address)
+          fqnd=$(terraform -chdir=terraform/ output public_ip_dns_name)
+
+          echo "public_ip=$ip" >> "$GITHUB_OUTPUT"
+          echo "fqnd=$fqnd" >> "$GITHUB_OUTPUT"
+
       # Get terraform outputs
 
       - name: ansible
         run: |
+          sed -i -e "s/_PLACEHOLDER_MASTER_IP_/${{steps.terraform.outputs.public_ip}}/g" ansible/inventory/k3s/hosts.ini
+          sed -i -e "s/_PLACEHOLDER_MASTER_IP_/${{steps.terraform.outputs.public_ip}}/g" ansible/inventory/k3s/group_vars/all.yml
           ansible-playbook ansible/site.yml -i ansible/inventory/k3s/hosts.ini
-      
-      # Change master-ip group_vars/all.yml
-      # Change master-ip hosts.ini
       

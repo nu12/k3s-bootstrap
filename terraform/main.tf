@@ -17,12 +17,18 @@ resource "azurerm_subnet" "k3s" {
   address_prefixes     = ["10.0.2.0/24"]
 }
 
+resource "random_string" "label" {
+  length           = 16
+  special          = false
+  upper            = false
+}
+
 resource "azurerm_public_ip" "k3s" {
   name                = "k3s"
   resource_group_name = azurerm_resource_group.k3s.name
   location            = azurerm_resource_group.k3s.location
   allocation_method   = "Static"
-  #domain_name_label
+  domain_name_label   = "k3s-${random_string.label.id}"
 }
 
 resource "azurerm_network_interface" "k3s" {
