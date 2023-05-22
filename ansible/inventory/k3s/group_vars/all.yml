@@ -3,5 +3,5 @@ k3s_version: v1.22.3+k3s1
 ansible_user: azureuser
 systemd_dir: /etc/systemd/system
 master_ip: "_PLACEHOLDER_MASTER_IP_"
-extra_server_args: ""
+extra_server_args: "--write-kubeconfig-mode 644 --no-deploy traefik"
 extra_agent_args: ""

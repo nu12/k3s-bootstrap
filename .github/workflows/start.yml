@@ -4,28 +4,38 @@ jobs:
   Start:
     runs-on: ubuntu-latest
     steps:
-      - name: terraform
+      - uses: actions/checkout@v3
+      - id: terraform
+        name: terraform
         run: |
-          sed s/_PLACEHOLDER_SUBSCRIPTION_/${{secret.ARM_SUBSCRIPTION_ID}}/_PLACEHOLDER_STORAGE_ACCOUNT_/${{secret.STORAGE_ACCOUNT_NAME}}/g terraform/backend.conf
+          sed -i -e "s/_PLACEHOLDER_SUBSCRIPTION_/${{secrets.ARM_SUBSCRIPTION_ID}}/g" -e "s/_PLACEHOLDER_STORAGE_ACCOUNT_/${{secrets.STORAGE_ACCOUNT_NAME}}/g" terraform/backend.conf
 
-          echo $SSH_PUBLIC > ~/.ssh/id_rsa.pub
-          echo $SSH_PRIVATE > ~/.ssh/id_rsa
-          chmod 400 ~/.ssh/id_rsa
+          mkdir -p ~/.ssh
+          echo "${{secrets.SSH_PUBLIC}}" > ~/.ssh/id_rsa.pub
+          echo "${{secrets.SSH_PRIVATE}}" > ~/.ssh/id_rsa
+          chmod 644 ~/.ssh/id_rsa.pub
+          chmod 600 ~/.ssh/id_rsa
 
-          export ARM_CLIENT_ID="${{secret.ARM_CLIENT_ID}}"
-          export ARM_CLIENT_SECRET="${{secret.ARM_CLIENT_SECRET}}"
-          export ARM_TENANT_ID="${{secret.ARM_TENANT_ID}}"
-          export ARM_SUBSCRIPTION_ID="${{secret.ARM_SUBSCRIPTION_ID}}"
+          export ARM_CLIENT_ID="${{secrets.ARM_CLIENT_ID}}"
+          export ARM_CLIENT_SECRET="${{secrets.ARM_CLIENT_SECRET}}"
+          export ARM_TENANT_ID="${{secrets.ARM_TENANT_ID}}"
+          export ARM_SUBSCRIPTION_ID="${{secrets.ARM_SUBSCRIPTION_ID}}"
 
-          terraform init -chdir=terraform/ -backend-config=backend.conf
+          terraform -chdir=terraform/ init -backend-config=backend.conf
           terraform -chdir=terraform/ apply -auto-approve
 
-      # Get terraform outputs
+          ip=$(terraform -chdir=terraform/ output public_ip_address)
+          fqnd=$(terraform -chdir=terraform/ output public_ip_dns_name)
+
+          echo "public_ip=$ip" >> "$GITHUB_OUTPUT"
+          echo "fqnd=$fqnd" >> "$GITHUB_OUTPUT"
 
       - name: ansible
         run: |
+          sed -i -e "s/_PLACEHOLDER_MASTER_IP_/${{steps.terraform.outputs.public_ip}}/g" ansible/inventory/k3s/hosts.ini
+          sed -i -e "s/_PLACEHOLDER_MASTER_IP_/${{steps.terraform.outputs.public_ip}}/g" ansible/inventory/k3s/group_vars/all.yml
+          
+          ssh-keyscan -H ${{steps.terraform.outputs.public_ip}} >> ~/.ssh/known_hosts
+          
           ansible-playbook ansible/site.yml -i ansible/inventory/k3s/hosts.ini
-      
-      # Change master-ip group_vars/all.yml
-      # Change master-ip hosts.ini
       
