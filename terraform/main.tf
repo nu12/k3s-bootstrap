@@ -18,7 +18,7 @@ resource "azurerm_subnet" "k3s" {
 }
 
 resource "random_string" "label" {
-  length           = 16
+  length           = 8
   special          = false
   upper            = false
 }
@@ -51,7 +51,7 @@ resource "azurerm_virtual_machine" "k3s" {
   location              = azurerm_resource_group.k3s.location
   resource_group_name   = azurerm_resource_group.k3s.name
   network_interface_ids = [azurerm_network_interface.k3s.id]
-  vm_size               = "Standard_B2s"
+  vm_size               = var.vm_size
 
   delete_os_disk_on_termination = true
   delete_data_disks_on_termination = true
