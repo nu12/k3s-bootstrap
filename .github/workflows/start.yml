@@ -59,3 +59,9 @@ jobs:
 
           ansible-playbook ansible/cert-manager.yml -i ansible/inventory/k3s/hosts.ini
       
+      - name: gitlab
+        run: |
+          sed -i -e "s/_PLACEHOLDER_FQND_/${{steps.terraform.outputs.fqnd}}/g" ansible/roles/gitlab/files/manifests.yaml
+
+          ansible-playbook ansible/gitlab.yml -i ansible/inventory/k3s/hosts.ini
+      

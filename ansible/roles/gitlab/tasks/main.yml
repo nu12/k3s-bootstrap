@@ -1,0 +1,26 @@
+---
+
+- name: Create gitlab namespace
+  kubernetes.core.k8s:
+    name: gitlab
+    api_version: v1
+    kind: Namespace
+    state: present
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
+
+- name: Copy gitlab manifests
+  ansible.builtin.copy:
+    src: manifests.yaml
+    dest: ~/manifests.yaml
+
+- name: Apply gitlab manifests to the cluster
+  kubernetes.core.k8s:
+    state: present
+    src: ~/manifests.yaml
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
+    namespace: gitlab
+
+- name: Remove gitlab manifests from disk
+  file:
+    path: ~/manifests.yaml
+    state: absent
