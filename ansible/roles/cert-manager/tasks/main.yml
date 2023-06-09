@@ -41,7 +41,7 @@
 
 - name: Copy cluster issuer manifest
   ansible.builtin.copy:
-    src: ansible/roles/cert-manager/manifests/cluster-issuer.yaml
+    src: cluster-issuer.yaml
     dest: ~/cluster-issuer.yaml
 
 - name: Apply cluster issuer manifest to the cluster
