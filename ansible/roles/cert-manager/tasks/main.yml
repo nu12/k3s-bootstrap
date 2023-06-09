@@ -38,3 +38,9 @@
     release_namespace: cert-manager
     create_namespace: false
     kubeconfig: /etc/rancher/k3s/k3s.yaml
+
+- name: Apply cluster issuer manifest to the cluster
+  kubernetes.core.k8s:
+    state: present
+    src: ansible/roles/cert-manager/manifests/cluster-issuer.yaml
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
