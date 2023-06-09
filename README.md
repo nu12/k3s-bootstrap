@@ -37,7 +37,7 @@ List of needed secrets:
 
 Desired features to be added:
 * Add a VMSS for worker nodes.
-* Optionally deploy nginx + cert-manager, gitlab, nexus repository, elastic stack in the cluster.
+* Optionally deploy cert-manager, gitlab, nexus repository, elastic stack in the cluster.
 * Add parameter values to the script such as location, VM sizes, etc.
 
 PRs are welcomed.

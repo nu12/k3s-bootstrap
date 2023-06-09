@@ -1,5 +1,14 @@
 name: Create K3s cluster
-on: [workflow_dispatch]
+on: 
+  workflow_dispatch:
+    inputs:
+      vm_size:
+        type: choice
+        description: VM Size
+        options: 
+        - Standard_B2s
+        - Standard_B4s
+        - Standard_B4ms
 jobs:
   Start:
     runs-on: ubuntu-latest
@@ -20,6 +29,8 @@ jobs:
           export ARM_CLIENT_SECRET="${{secrets.ARM_CLIENT_SECRET}}"
           export ARM_TENANT_ID="${{secrets.ARM_TENANT_ID}}"
           export ARM_SUBSCRIPTION_ID="${{secrets.ARM_SUBSCRIPTION_ID}}"
+
+          export TF_VAR_vm_size=${{ inputs.vm_size }}
 
           terraform -chdir=terraform/ init -backend-config=backend.conf
           terraform -chdir=terraform/ apply -auto-approve
