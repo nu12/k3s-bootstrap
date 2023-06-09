@@ -39,8 +39,18 @@
     create_namespace: false
     kubeconfig: /etc/rancher/k3s/k3s.yaml
 
+- name: Copy cluster issuer manifest
+  ansible.builtin.copy:
+    src: ansible/roles/cert-manager/manifests/cluster-issuer.yaml
+    dest: ~/cluster-issuer.yaml
+
 - name: Apply cluster issuer manifest to the cluster
   kubernetes.core.k8s:
     state: present
-    src: ansible/roles/cert-manager/manifests/cluster-issuer.yaml
+    src: ~/cluster-issuer.yaml
     kubeconfig: /etc/rancher/k3s/k3s.yaml
+
+- name: Remove cluster issuer manifest from disk
+  file:
+    path: ~/cluster-issuer.yaml
+    state: absent
