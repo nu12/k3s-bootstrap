@@ -8,20 +8,20 @@
     state: present
     kubeconfig: /etc/rancher/k3s/k3s.yaml
 
-- name: Download cert-manager CRD.
+- name: Download cert-manager CRDs
   ansible.builtin.get_url:
     url: https://github.com/cert-manager/cert-manager/releases/download/v1.12.0/cert-manager.crds.yaml
     dest: ~/cert-manager.crds.yaml
     mode: '0664'
 
-- name: Apply cert-manager CRD manifest to the cluster.
+- name: Apply cert-manager CRD manifest to the cluster
   kubernetes.core.k8s:
     state: present
     src: ~/cert-manager.crds.yaml
     namespace: cert-manager
     kubeconfig: /etc/rancher/k3s/k3s.yaml
 
-- name: Remove cert-manager CRD manifests from disk.
+- name: Remove cert-manager CRD manifests from disk
   file:
     path: ~/cert-manager.crds.yaml
     state: absent
