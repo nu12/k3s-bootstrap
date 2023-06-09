@@ -55,5 +55,7 @@ jobs:
 
       - name: cert-namager
         run: |
+          sed -i -e "s/_PLACEHOLDER_FQND_/${{steps.terraform.outputs.fqnd}}/g" ansible/roles/cert-manager/tasks/main.yml
+
           ansible-playbook ansible/cert-manager.yml -i ansible/inventory/k3s/hosts.ini
       
