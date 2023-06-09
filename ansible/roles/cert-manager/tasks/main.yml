@@ -54,3 +54,34 @@
   file:
     path: ~/cluster-issuer.yaml
     state: absent
+
+- name: Create nginx namespace
+  kubernetes.core.k8s:
+    name: nginx
+    api_version: v1
+    kind: Namespace
+    state: present
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
+
+- name: Download NGINX manifest to the cluster
+  ansible.builtin.get_url:
+    url: https://gist.githubusercontent.com/nu12/7e99b2ec26df8250c894874a221e56b2/raw
+    dest: ~/nginx.yaml
+
+- name: Replace host
+  ansible.builtin.replace:
+    path: ~/nginx.yaml
+    regexp: example.com
+    replace: _PLACEHOLDER_FQND_
+
+- name: Apply NGINX manifest to the cluster
+  kubernetes.core.k8s:
+    state: present
+    src: ~/nginx.yaml
+    namespace: nginx
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
+
+- name: Remove NGINX manifest from disk
+  file:
+    path: ~/nginx.yaml
+    state: absent
