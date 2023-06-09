@@ -1,0 +1,6 @@
+---
+    
+- hosts: master
+  become: yes
+  roles:
+    - role: cert-manager

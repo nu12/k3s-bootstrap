@@ -47,6 +47,12 @@ jobs:
           sed -i -e "s/_PLACEHOLDER_MASTER_IP_/${{steps.terraform.outputs.public_ip}}/g" ansible/inventory/k3s/group_vars/all.yml
           
           ssh-keyscan -H ${{steps.terraform.outputs.public_ip}} >> ~/.ssh/known_hosts
+
+          ansible-galaxy collection install -r ansible/collections/requirements.yml
           
           ansible-playbook ansible/site.yml -i ansible/inventory/k3s/hosts.ini
+
+      - name: cert-namager
+        run: |
+          ansible-playbook ansible/cert-manager.yml -i ansible/inventory/k3s/hosts.ini
       
